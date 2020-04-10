@@ -25,8 +25,8 @@ class UriValidatorTest {
     fun setUp() {
         mockContext = Mockito.mock(Context::class.java)
         Mockito.`when`(mockContext.getString(R.string.nothing)).thenReturn(NOTHING)
-        Mockito.`when`(mockContext.getString(R.string.file)).thenReturn(FILE)
         Mockito.`when`(mockContext.getString(R.string.url)).thenReturn(URL)
+        Mockito.`when`(mockContext.getString(R.string.file)).thenReturn(FILE)
         uriValidator = UriValidator(mockContext)
     }
 
@@ -34,6 +34,8 @@ class UriValidatorTest {
     @Test
     fun validate() {
         assertThat(uriValidator.validate("http://google.com"), `is`(URL))
+        assertThat(uriValidator.validate("file://sdcard/DCIM/img001.jpg"), `is`(FILE))
+        assertThat(uriValidator.validate("bla-bla-bla"), `is`(NOTHING))
     }
 
 
