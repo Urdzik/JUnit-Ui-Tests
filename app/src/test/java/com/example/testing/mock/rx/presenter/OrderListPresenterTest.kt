@@ -9,6 +9,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.*
@@ -57,8 +58,18 @@ class OrderListPresenterTest {
         verify(mockView).hideProgress()
         verify(mockView).showError(error)
         verify(mockView, never()).showOrders(ArgumentMatchers.anyList())
-
     }
+
+    @Test
+    fun refreshWithoutView() {
+        presenter.detachView()
+        presenter.refresh()
+
+        verify(orderRepository, never()).getOrders()
+        verify(mockView, never()).showProgress()
+        verify(mockView, never()).showOrders(ArgumentMatchers.anyList())
+    }
+
 
     @After
     fun tearDown() {

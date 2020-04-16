@@ -9,8 +9,6 @@ open class BasePresenter <V>{
     }
 
 
-
-
     fun detachView() {
         view = null
     }
