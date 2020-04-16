@@ -9,6 +9,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
@@ -19,7 +20,7 @@ import java.util.*
 @RunWith(MockitoJUnitRunner::class)
 class OrderListPresenterTest {
 
-    lateinit var orderListPresenter: OrderListPresenter
+    lateinit var presenter: OrderListPresenter
 
     @Mock
     lateinit var orderRepository: OrderRepository
@@ -29,20 +30,34 @@ class OrderListPresenterTest {
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        orderListPresenter = OrderListPresenter(orderRepository, Schedulers.trampoline(), Schedulers.trampoline())
-        orderListPresenter.attachView(mockView)
+        presenter = OrderListPresenter(orderRepository, Schedulers.trampoline(), Schedulers.trampoline())
+        presenter.attachView(mockView)
     }
 
     @Test
     fun refresh() {
         val fakeOrders :List<Order> = getFakeOrderList()
         `when`(orderRepository.getOrders()).thenReturn(Observable.just(fakeOrders))
-        orderListPresenter.refresh()
+        presenter.refresh()
 
         verify(mockView).showProgress()
         verify(mockView).hideProgress()
         verify(mockView).showOrders(fakeOrders);
         verify(mockView, never()).showError(anyString())
+    }
+
+    @Test
+    fun refreshFailed(){
+        val error = "Network error"
+        `when`(orderRepository.getOrders()).thenReturn(Observable.error(Exception(error)))
+
+        presenter.refresh()
+
+        verify(mockView).showProgress()
+        verify(mockView).hideProgress()
+        verify(mockView).showError(error)
+        verify(mockView, never()).showOrders(ArgumentMatchers.anyList())
+
     }
 
     @After
